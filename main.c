@@ -43,6 +43,7 @@ void USART2_IRQHandler()
 
 	/* If this interrupt is for a transmit... */
 	if (USART_GetITStatus(USART2, USART_IT_TXE) != RESET) {
+        // transmit interrupt
 		/* "give" the serial_tx_wait_sem semaphore to notfiy processes
 		 * that the buffer has a spot free for the next byte.
 		 */
@@ -53,6 +54,7 @@ void USART2_IRQHandler()
 		USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
 		/* If this interrupt is for a receive... */
 	} else if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
+        // receive interrupt
 		/* Receive the byte from the buffer. */
 		rx_msg.ch = USART_ReceiveData(USART2);
 
@@ -69,7 +71,7 @@ void USART2_IRQHandler()
 		 */
 		while (1);
 	}
-
+    // yield
 	if (xHigherPriorityTaskWoken)
 		taskYIELD();
 }
