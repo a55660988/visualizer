@@ -163,6 +163,44 @@ void queue_str_task2(void *pvParameters)
 	queue_str_task("Hello 2\n\r", 50);
 }
 
+int i_fib(int num){
+    int i=0;
+    int x=0, y=1, z=1;
+    for(i=0; i<num; i++){
+        z = x+y;
+        y = x;
+        x = z;
+    }
+    return z;
+}
+
+int r_fib(int num){
+    if(num<=0){
+        return 0;
+    }else if(num == 1){
+        return 1;
+    }else{
+        return r_fib(num-1) + r_fib(num-2);
+    }
+}
+
+void Task1(void *pvParameters){
+    int i;
+    queue_str_task("i_fib_task\n\r", 100);
+    for(i=0; i<5000; i++){
+        queue_str_task("i_fib_task\n\r", 100);
+        i_fib(40);
+    }
+}
+void Task2(void *pvParameters){
+    int i;
+    queue_str_task("r_fib_task\n\r", 100);
+    for(i=0; i<5000; i++){
+        queue_str_task("r_fib_task\n\r", 100);
+        r_fib(40);
+    }
+}
+
 void serial_readwrite_task(void *pvParameters)
 {
 	serial_str_msg msg;
@@ -237,6 +275,15 @@ int main()
 	            (signed portCHAR *) "Serial Write 2",
 	            512 /* stack size */,
 	            NULL, tskIDLE_PRIORITY + 10, NULL);
+	
+    xTaskCreate(Task1,
+	            (signed portCHAR *) "i_fib",
+	            512 /* stack size */, NULL,
+	            tskIDLE_PRIORITY + 8, NULL);
+	xTaskCreate(Task2,
+	            (signed portCHAR *) "r_fib",
+	            512 /* stack size */, NULL,
+	            tskIDLE_PRIORITY + 8, NULL);
 
 	/* Create a task to write messages from the queue to the RS232 port. */
 	xTaskCreate(rs232_xmit_msg_task,
